@@ -1,0 +1,33 @@
+{
+  "name": "channel",
+
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+
+      "Packages": {
+        "$className": "Folder",
+
+        "Channel": {
+          "$path": "src"
+        }
+      }
+    },
+
+    "ServerScriptService": {
+        "Channel": {
+            "$path": "tests/server"
+        }
+    },
+
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Channel": {
+          "$path": "tests/client"
+        }
+      }
+    }
+  }
+}
