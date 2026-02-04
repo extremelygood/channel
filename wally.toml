@@ -1,0 +1,9 @@
+[package]
+name = "extremelygood/channel"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+description = "A simple networking solution based on the usage of hierarchical channels"
+exclude = ["tests", "selene.toml", "rokit.toml", "dev.project.json"]
+
+[dependencies]
