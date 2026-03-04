@@ -69,6 +69,24 @@ function ChannelClient.onDestroy(self: ChannelClientImpl, eventHandler: fSignal.
 	return self.context.bindOnDestroy(eventHandler)
 end
 
+function ChannelClient.isActive(self: ChannelClientImpl): boolean
+	return self.context.queryIsActive()
+end
+
+function ChannelClient.onActive(
+	self: ChannelClientImpl,
+	eventHandler: (alreadyActive: boolean) -> ()
+): fSignal.DisconnectFun
+	if self:isActive() then
+		eventHandler(true)
+		return function() end
+	end
+
+	return self.context.bindOnActive(function(_alreadyActiveFromContext)
+		eventHandler(false)
+	end)
+end
+
 function ChannelClient.expectChild(self: ChannelClientImpl, predicate: (IChannelClient) -> boolean): IChannelClient
 	return ExpectedChannel.new(self.context.bindOnChild, function()
 		return self:children()

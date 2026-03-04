@@ -17,6 +17,8 @@ type ExpectedChannelImpl<D = nil> = typeof(ExpectedChannel) & IChannelClient<D> 
 	onMessageSignal: fSignal.FunSignal<...any>,
 	onChildSignal: fSignal.FunSignal<IChannelClient>,
 	onDestroySignal: fSignal.FunSignal<>,
+	onActiveSignal: fSignal.FunSignal<boolean>,
+	isCurrentlyActive: boolean,
 
 	stopResolving: fSignal.DisconnectFun?,
 }
@@ -34,6 +36,8 @@ function ExpectedChannel.new(
 		onMessageSignal = fSignal(),
 		onChildSignal = fSignal(),
 		onDestroySignal = fSignal(),
+		onActiveSignal = fSignal(),
+		isCurrentlyActive = false,
 	})
 
 	for _i, resolvable in queryResolvable() do
@@ -120,6 +124,26 @@ function ExpectedChannel.onDestroy(
 	return self.onDestroySignal.bind(eventHandler)
 end
 
+function ExpectedChannel.isActive(self: ExpectedChannelImpl): boolean
+	if self.resolvedChannel then
+		return self.resolvedChannel:isActive()
+	end
+
+	return false
+end
+
+function ExpectedChannel.onActive(
+	self: ExpectedChannelImpl,
+	eventHandler: (alreadyActive: boolean) -> ()
+): fSignal.DisconnectFun
+	if self:isActive() then
+		eventHandler(true)
+		return function() end
+	end
+
+	return self.onActiveSignal.bind(eventHandler)
+end
+
 function ExpectedChannel.expectChild(self: ExpectedChannelImpl, predicate: (IChannelClient) -> boolean): any
 	local newExpected = ExpectedChannel.new(self.onChildSignal.bind, function()
 		return self:children()
@@ -142,6 +166,14 @@ function ExpectedChannel._resolve(self: ExpectedChannelImpl, channel: IChannelCl
 	channel:onChild(self.onChildSignal.fire)
 	channel:onMessage(self.onMessageSignal.fire)
 	channel:onDestroy(self.onDestroySignal.fire)
+	channel:onActive(function(alreadyActive)
+		local adjustedAlreadyActive = alreadyActive
+		if not self.isCurrentlyActive and alreadyActive then
+			adjustedAlreadyActive = false
+		end
+		self.isCurrentlyActive = true
+		self.onActiveSignal.fire(adjustedAlreadyActive)
+	end)
 
 	-- It could be possible that onChild is not fired again, since
 	-- channels are sent along with its children in one packet.

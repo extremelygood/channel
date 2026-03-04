@@ -1,5 +1,4 @@
 --!strict
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local fSignal = require(script.Parent.utils.fSignal)
 type NilFun = () -> ()
@@ -42,6 +41,7 @@ export type NetWorldContextClient = {
 	bindOnChild: fSignal.BindFun<AnyChannelClient>,
 	bindOnMessage: fSignal.BindFun<...any>,
 	bindOnDestroy: fSignal.BindFun<>,
+	bindOnActive: fSignal.BindFun<boolean>,
 
 	-- Commands
 	fireServer: (...any) -> (),
@@ -50,6 +50,7 @@ export type NetWorldContextClient = {
 	queryParent: () -> AnyChannelClient?,
 	queryChildren: () -> { AnyChannelClient },
 	queryImmutableData: () -> any,
+	queryIsActive: () -> boolean,
 }
 
 type Channel<D = nil> = {
@@ -87,8 +88,10 @@ export type ChannelClient<D = nil> = Channel<D> & {
 	onMessage: (self: any, eventHandler: fSignal.EventHandler<...any>) -> fSignal.DisconnectFun,
 	onDestroy: (self: any, fSignal.EventHandler<>) -> fSignal.DisconnectFun,
 	onChild: (self: any, (newChild: AnyChannelClient) -> ()) -> NilFun,
+	onActive: (self: any, eventHandler: (alreadyActive: boolean) -> ()) -> fSignal.DisconnectFun,
 
 	immutableData: (self: any) -> D,
+	isActive: (self: any) -> boolean,
 	expectChild: (self: any, predicate: (newChild: AnyChannelClient) -> boolean) -> AnyChannelClient,
 }
 
@@ -127,8 +130,10 @@ export type AnyChannelClient = AnyChannel & {
 	onMessage: (self: any, eventHandler: fSignal.EventHandler<...any>) -> fSignal.DisconnectFun,
 	onDestroy: (self: any, fSignal.EventHandler<>) -> fSignal.DisconnectFun,
 	onChild: (self: AnyChannelClient, (newChild: AnyChannelClient) -> ()) -> NilFun,
+	onActive: (self: AnyChannelClient, eventHandler: (alreadyActive: boolean) -> ()) -> fSignal.DisconnectFun,
 
 	immutableData: (self: any) -> any,
+	isActive: (self: AnyChannelClient) -> boolean,
 	expectChild: (self: AnyChannelClient, predicate: (newChild: AnyChannelClient) -> boolean) -> AnyChannelClient,
 }
 

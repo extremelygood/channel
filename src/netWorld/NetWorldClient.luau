@@ -28,6 +28,8 @@ type StoredChannel = {
 	onChildAdded: fSignal.FunSignal<IChannelClient>,
 	onMessage: fSignal.FunSignal<...any>,
 	onDestroy: fSignal.FunSignal<>,
+	onActive: fSignal.FunSignal<boolean>,
+	isActive: boolean,
 }
 
 type NetWorldClientImpl = typeof(NetWorldClient) & {
@@ -112,6 +114,8 @@ function NetWorldClient._createChannel(self: NetWorldClientImpl, effect: NetClie
 	local onChildAdded = fSignal()
 	local onMessage = fSignal()
 	local onDestroy = fSignal()
+	local onActive = fSignal()
+	local storedChannel: StoredChannel
 
 	local newObj = ChannelClient.new(channelData.topic, channelData.uniqueIdent, {
 		fireServer = function(...: any)
@@ -169,14 +173,24 @@ function NetWorldClient._createChannel(self: NetWorldClientImpl, effect: NetClie
 			return channelData.immutableData
 		end,
 		bindOnDestroy = onDestroy.bind,
+		bindOnActive = function(eventHandler)
+			return storedChannel.onActive.bind(eventHandler)
+		end,
+		queryIsActive = function()
+			return storedChannel.isActive
+		end,
 	})
 
-	self.storedChannels[effect.channelId] = {
+	storedChannel = {
 		object = newObj,
 		onChildAdded = onChildAdded,
 		onMessage = onMessage,
 		onDestroy = onDestroy,
+		onActive = onActive,
+		isActive = true,
 	}
+	self.storedChannels[effect.channelId] = storedChannel
+	storedChannel.onActive.fire(true)
 
 	-- Events
 	local parent = newObj:parent()
@@ -194,6 +208,7 @@ function NetWorldClient._removeChannel(self: NetWorldClientImpl, effect: NetClie
 	local stored = self.storedChannels[effect.channelId]
 	assert(stored, `Attempt to destroy channel with id {effect.channelId} failed, could not find`)
 
+	stored.isActive = false
 	self.storedChannels[effect.channelId] = nil
 
 	stored.onDestroy.fire()
