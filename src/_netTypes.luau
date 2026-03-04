@@ -53,14 +53,14 @@ export type NetWorldContextClient = {
 	queryIsActive: () -> boolean,
 }
 
-type Channel<D = nil> = {
+type Channel<D = any> = {
 	-- MetaData
 	topic: (self: any) -> string,
 	uniqueIdent: (self: any) -> string,
 	immutableData: (self: any) -> D,
 }
 
-export type ChannelServer<D = nil> = Channel<D> & {
+export type ChannelServer<D = any> = Channel<D> & {
 	fireClient: (self: any, player: Player, ...any) -> (),
 	fireAllClients: (self: any, ...any) -> (),
 
@@ -79,7 +79,7 @@ export type ChannelServer<D = nil> = Channel<D> & {
 	replicationState: (self: any) -> ReplicationState,
 }
 
-export type ChannelClient<D = nil> = Channel<D> & {
+export type ChannelClient<D = any> = Channel<D> & {
 	fireServer: (self: any, ...any) -> (),
 
 	parent: (self: any) -> AnyChannelClient?,

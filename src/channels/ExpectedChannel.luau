@@ -7,9 +7,9 @@ local _netTypes = require(script.Parent.Parent._netTypes)
 local ExpectedChannel = {}
 Object.setIndexAndMeta(ExpectedChannel, Object)
 
-type IChannelClient<D = nil> = _netTypes.ChannelClient<D>
+type IChannelClient<D = any> = _netTypes.ChannelClient
 
-type ExpectedChannelImpl<D = nil> = typeof(ExpectedChannel) & IChannelClient<D> & {
+type ExpectedChannelImpl<D = any> = typeof(ExpectedChannel) & IChannelClient<D> & {
 	initialParent: IChannelClient?,
 	acceptPredicate: (IChannelClient) -> boolean,
 	resolvedChannel: IChannelClient<D>?,

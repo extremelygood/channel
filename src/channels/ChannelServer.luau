@@ -6,11 +6,11 @@ local _netTypes = require(script.Parent.Parent._netTypes)
 local ChannelServer = {}
 Object.setIndexAndMeta(ChannelServer, Object)
 
-type IChannelServer<D = nil> = _netTypes.ChannelServer<D>
+type IChannelServer<D = any> = _netTypes.ChannelServer<D>
 type NetContext = _netTypes.NetWorldContextServer
 type ReplicationState = _netTypes.ReplicationState
 
-type ChannelServerImpl<D = nil> = IChannelServer<D> & typeof(ChannelServer) & {
+type ChannelServerImpl<D = any> = IChannelServer<D> & typeof(ChannelServer) & {
 	topicString: string,
 	identString: string,
 	context: NetContext,

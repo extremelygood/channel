@@ -9,9 +9,9 @@ local ChannelClient = {}
 Object.setIndexAndMeta(ChannelClient, Object)
 
 type Context = _netTypes.NetWorldContextClient
-type IChannelClient<D = nil> = _netTypes.ChannelClient<D>
+type IChannelClient<D = any> = _netTypes.ChannelClient<D>
 
-type ChannelClientImpl<D = nil> = typeof(ChannelClient) & IChannelClient<D> & {
+type ChannelClientImpl<D = any> = typeof(ChannelClient) & IChannelClient<D> & {
 	topicString: string,
 	uniqueIdentString: string,
 
