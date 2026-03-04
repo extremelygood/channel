@@ -1,6 +1,6 @@
 [package]
 name = "extremelygood/channel"
-version = "0.1.0"
+version = "0.1.1"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 description = "A simple networking solution based on the usage of hierarchical channels"
